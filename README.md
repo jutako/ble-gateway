@@ -5,7 +5,7 @@ Raspberry pi gateway for BLE sensors. Work in progress.
 
 * runs locally on debian stretch, Python 3.5, built-in bluetooth
 * run in debian stretch based Python 3.5. docker container (some magic required to start, see bottom)
-* runs together with balena wifi connect (see branch on isomyy jkor/Code/github/balena-wifi-connect)
+* runs together with balena wifi connect (see `balena_wificonnect` directory)
 
 ## TODO / next steps
 
