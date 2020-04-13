@@ -9,7 +9,10 @@ from reporter import Reporter
 SENSOR_MAC_ARR = [
     'E2:42:6F:37:12:D9',
     'DE:41:38:3F:44:59',
-    'D7:9C:82:BC:A8:1E'
+    'D7:9C:82:BC:A8:1E',
+    'D8:9F:A1:92:03:43',
+    'CA:35:EF:13:E5:EB',
+    'E3:F1:CA:6A:86:FA'
 ]
 
 MIN_REPORT_INTERVAL_SEC = 30
