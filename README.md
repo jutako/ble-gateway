@@ -18,6 +18,7 @@ Raspberry pi gateway for BLE sensors. Work in progress.
 # Howto
 
 Uses libarary:
+
 https://pypi.org/project/ruuvitag_sensor/
 
 
