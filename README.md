@@ -55,6 +55,8 @@ BLE tools require sudo. Explicit reference to venv's python executable is needed
 Files under app/ need to be copied to the same directory as the Dockerfile for the docker build to work. Master versions of the files reside in app/.
 
 ```` bash
+cp app/*.* docker_debian/
+cd docker_debian
 docker build -t gwtest .
 sudo docker run -d --net=host --privileged -i -t gwtest
 ````
