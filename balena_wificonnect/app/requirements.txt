@@ -1,3 +1,0 @@
-wheel
-ruuvitag_sensor
-influxdb

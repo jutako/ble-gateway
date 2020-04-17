@@ -4,9 +4,9 @@ import json
 import time
 from reporter import Reporter
 
-influx_host = "157.230.98.123"
+influx_host = "add-server-url"
 influx_port = 8087
-influx_db = 'sensor_raspigw'
+influx_db = 'add-db-name'
 
 device_mac = 'AA:11:BB:22:CC:D3'
 data = {

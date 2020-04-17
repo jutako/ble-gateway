@@ -16,9 +16,9 @@ SENSOR_MAC_ARR = [
 ]
 
 MIN_REPORT_INTERVAL_SEC = 30
-INFLUX_HOST = "157.230.98.123"
+INFLUX_HOST = "add-host-url"
 INFLUX_PORT = 8087
-INFLUX_DB = 'sensor_raspigw'
+INFLUX_DB = 'add-db-name'
 VERBOSE = True
 
 # Initialize
