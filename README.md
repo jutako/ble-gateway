@@ -54,11 +54,24 @@ BLE tools require sudo. Explicit reference to venv's python executable is needed
 
 Files under app/ need to be copied to the same directory as the Dockerfile for the docker build to work. Master versions of the files reside in app/.
 
+### Step 1
+
+Add the server and database to app.py
+
+### Step 2
+
+Run these to test or deploy:
+
 ```` bash
 cp app/*.* docker_debian/
 cd docker_debian
+
 docker build -t gwtest .
 sudo docker run -d --net=host --privileged -i -t gwtest
+
+docker build -t ble-gateway .
+sudo docker run -d --restart=always --net=host --privileged -i -t ble-gateway
+
 ````
 
 Other docker commands that might be of help in some environments:
@@ -80,5 +93,17 @@ cd balena_wificonnect
 balena push BLE-gateway
 ````
 
+```` bash
+balena login
+
+cp app/*.* docker_debian/
+cd docker_debian
+balena push BLE-gateway
+````
+
 The Dockerfile should be named `Dockerfile.template`: otherwise balena push command doesn't fetch the base image correctly.
 Files under `balena_wificonnect` are copies from `app` as files to copy need to be in the same directory structure as the Dockerfile and symlinks do not work (?).
+
+# Changelog
+
+2021-01-23 Changed to python:3.8-buster in Dockerfile due to pip install problems. Improved pip installation commands as well.
