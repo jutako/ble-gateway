@@ -12,7 +12,10 @@ SENSOR_MAC_ARR = [
     'D7:9C:82:BC:A8:1E',
     'D8:9F:A1:92:03:43',
     'CA:35:EF:13:E5:EB',
-    'E3:F1:CA:6A:86:FA'
+    'E3:F1:CA:6A:86:FA',
+    'F7:88:68:03:3F:FA',
+    'FA:43:18:72:4F:08',
+    'CF:6E:06:5E:67:93',
 ]
 
 MIN_REPORT_INTERVAL_SEC = 30
