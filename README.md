@@ -90,7 +90,8 @@ Install balena command line tool. Then:
 balena login
 cp app/*.* balena_wificonnect/app
 cd balena_wificonnect
-balena push BLE-gateway
+balena push BLE-gateway # OR
+balena push BLE-gateway-test
 ````
 
 ```` bash

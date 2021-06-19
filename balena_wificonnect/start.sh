@@ -6,7 +6,7 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # sometimes. In this case, following checks will fail and wifi-connect
 # will be launched even if the device will be able to connect to a WiFi network.
 # If this is your case, you can wait for a while and then check for the connection.
-# sleep 15
+sleep 30
 
 # Choose a condition for running WiFi Connect according to your use case:
 
@@ -17,10 +17,10 @@ export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
 # nmcli -t g | grep full
 
 # 3. Is there Internet connectivity via a google ping?
-# wget --spider http://google.com 2>&1
+wget --spider http://google.com 2>&1
 
 # 4. Is there an active WiFi connection?
-iwgetid -r
+#iwgetid -r
 
 if [ $? -eq 0 ]; then
     printf 'Skipping WiFi Connect\n'

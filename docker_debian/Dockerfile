@@ -5,9 +5,10 @@ RUN apt-get update \
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-COPY reporter.py ./
-COPY app.py ./
+COPY app/requirements.txt ./
+COPY app/reporter.py ./
+COPY app/app.py ./
+COPY app/config.py ./
  
 RUN python3 -m pip install --upgrade pip && python3 -m pip install --no-cache-dir -r requirements.txt
 
