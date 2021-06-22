@@ -88,6 +88,7 @@ Install balena command line tool. Then:
 
 ```` bash
 balena login
+mkdir balena_wificonnect/
 cp app/*.* balena_wificonnect/app
 cd balena_wificonnect
 balena push BLE-gateway # OR
@@ -107,4 +108,5 @@ Files under `balena_wificonnect` are copies from `app` as files to copy need to 
 
 # Changelog
 
+2021-06-19 Upgraded balena wifi-connect. Now using debian from balena container images as the base. Balena python example was outdated.
 2021-01-23 Changed to python:3.8-buster in Dockerfile due to pip install problems. Improved pip installation commands as well.
