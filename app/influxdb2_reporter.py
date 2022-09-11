@@ -24,14 +24,17 @@ class InfluxDB2Reporter:
         influx_port: str,
         organisation: str,
         token: str,
+        bucket: str,
         gateway_name: str=None) -> None:
         
-        # Create client
-        self.client = InfluxDBClient(
+        # Create influx_client
+        self.influx_client = InfluxDBClient(
             url=f"{influx_host}:{influx_port}",
             org=organisation,
             token=token,   
         )
+
+        self.bucket = bucket
 
         # Set gateway name, helps identify logger devices
         if gateway_name is None:
@@ -46,17 +49,17 @@ class InfluxDB2Reporter:
     #def connect_influx(self, host, port):
     #    return InfluxDBClient(host=host, port=port)
 
-    def write_influx(self, bucket: str, points: List[Point]) -> None:
+    def write_influx(points: List[Point]) -> None:
 
-        write_api = self.client.write_api(write_options=SYNCHRONOUS)
+        write_api = self.influx_client.write_api(write_options=SYNCHRONOUS)
 
-        write_api.write(bucket=bucket, record=points)
+        write_api.write(bucket=self.bucket, record=points)
 
     
     #def disconnect_influx(self):
     #    self.influx_client.close()
 
-    def make_ruuvitag_point(self, device_mac: str, data: dict) -> Point:
+    def make_ruuvitag_record_raspigw(self, device_mac: str, data: dict) -> Point:
         """Creates a full record of type Point() for writing to InfluxDB 2.x.
         """
 

@@ -1,3 +1,4 @@
 wheel
 ruuvitag_sensor
+influxdb
 influxdb_client

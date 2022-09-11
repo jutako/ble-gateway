@@ -11,8 +11,7 @@ Raspberry pi gateway for BLE sensors. Work in progress.
 
 ## TODO / next steps
 
-* use environment variables or a JSON config to pass all sensitive information
-* connect balena app to repo
+* use environment variables or a JSON config to pass all sensitive information. Would also make changing endpoints easy.
 
 
 # Howto
@@ -88,9 +87,10 @@ Install balena command line tool. Then:
 
 ```` bash
 balena login
-mkdir balena_wificonnect/
-cp app/*.* balena_wificonnect/app
-cd balena_wificonnect
+mkdir balena_basic/
+cp app/*.* balena_basic/app
+cp app/config_prod.py balena_basic/app/config.py
+cd balena_basic
 balena push BLE-gateway # OR
 balena push BLE-gateway-test
 ````
@@ -108,5 +108,6 @@ Files under `balena_wificonnect` are copies from `app` as files to copy need to 
 
 # Changelog
 
+2022-09-11 Added three new ruuvi tag mac addresses
 2021-06-19 Upgraded balena wifi-connect. Now using debian from balena container images as the base. Balena python example was outdated.
 2021-01-23 Changed to python:3.8-buster in Dockerfile due to pip install problems. Improved pip installation commands as well.
