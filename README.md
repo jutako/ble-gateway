@@ -9,14 +9,9 @@ Raspberry pi gateway for BLE sensors. Work in progress.
 * runs together with balena wifi connect (see `balena_wificonnect` directory)
 * testing git hooks
 
-## TODO / next steps
-
-* use environment variables or a JSON config to pass all sensitive information. Would also make changing endpoints easy.
-
-
 # Howto
 
-Uses libarary:
+Uses library:
 
 https://pypi.org/project/ruuvitag_sensor/
 
@@ -105,6 +100,35 @@ balena push BLE-gateway
 
 The Dockerfile should be named `Dockerfile.template`: otherwise balena push command doesn't fetch the base image correctly.
 Files under `balena_wificonnect` are copies from `app` as files to copy need to be in the same directory structure as the Dockerfile and symlinks do not work (?).
+
+# Known issues
+
+## Deprecated hcitool
+
+It seems Linux hcitool has not been maintained in several years. On Tuxedo OS 22.04 (jammy) hcitool gives error:
+```
+jkor@tux:~$ sudo hcitool lescan
+Set scan parameters failed: Input/output error
+```
+
+Another option is to use the cross platform BLE adapters, such as Bleak. However, the asyncio example given on https://github.com/ttu/ruuvitag-sensor worked only on latest ruuvitag-sensor installed from github:
+ ```
+python -m pip install -U git+https://github.com/ttu/ruuvitag-sensor
+ ```
+
+Especially it did not work on ruuvitag-sensor==2.0.0 from pypi.
+# TODO
+
+* use environment variable to set gateway name/id
+* use environment variables or a JSON config to pass all sensitive information. Would also make changing endpoints easy.
+* collect all configurations to same file as dict. Select environment using environment variable or command line paramenter.
+* configure local development with venv
+* configure local development with docker
+* add docker-compose.yaml files for ease of configuration for multicontainer use
+* add support for http API data output
+* document testing and deployment to balena
+* how to add as one container to a multicontainer balena project
+* use logging module
 
 # Changelog
 

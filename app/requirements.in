@@ -1,0 +1,4 @@
+wheel
+ruuvitag_sensor
+influxdb  # influxdb v1.x
+#influxdb_client  # influxdb v2.x

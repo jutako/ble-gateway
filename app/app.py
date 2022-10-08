@@ -84,4 +84,4 @@ def handle_data(data):
 if __name__=="__main__":
     # Start the handler
     # Loops forever?
-    RuuviTagSensor.get_datas(handle_data, SENSOR_MAC_ARR)
+    RuuviTagSensor.get_data(handle_data, SENSOR_MAC_ARR)

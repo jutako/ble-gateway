@@ -1,8 +1,12 @@
 from ruuvitag_sensor.ruuvi import RuuviTagSensor
 
+import ruuvitag_sensor.log
+
+ruuvitag_sensor.log.enable_console()
+
 # List of macs of sensors which data will be collected
 # If list is empty, data will be collected for all found sensors
-tag1 = 'CA:35:EF:13:E5:EB'
+tag1 = 'DD:E1:7C:BF:36:F4'
 
 
 
@@ -13,4 +17,5 @@ def handle_data(found_data):
 
 
 macs = [tag1]
-RuuviTagSensor.get_datas(handle_data, macs)
+#macs = []
+RuuviTagSensor.get_data(handle_data, macs)
