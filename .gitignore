@@ -105,6 +105,7 @@ venv.bak/
 
 app/config.py
 docker_debian/app/
+docker_debian/config.py
 balena_wificonnect/app/
 balena_basic/app/
 tmp/

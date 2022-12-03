@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+  ruuvigw:
+    container_name: ruuvi-ble-gw
+    build: ./docker_debian
+    restart: unless-stopped
+    network_mode: "host"
+    privileged: true
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"

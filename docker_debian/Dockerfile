@@ -5,11 +5,11 @@ RUN apt-get update \
 
 WORKDIR /usr/src/app
 
-COPY app/requirements.txt ./
-COPY app/reporter.py ./
-COPY app/app.py ./
-COPY app/config.py ./
+COPY ./app/requirements.txt ./
+COPY ./app/reporter.py ./
+COPY ./app/app.py ./
+COPY ./config.py ./
  
-RUN python3 -m pip install --upgrade pip && python3 -m pip install --no-cache-dir -r requirements.txt
+RUN python3 -m pip install --upgrade pip setuptools wheel && python3 -m pip install --no-cache-dir -r requirements.txt
 
 CMD ["python", "./app.py" ]

@@ -55,14 +55,22 @@ Files under app/ need to be copied to the same directory as the Dockerfile for t
 
 ### Step 1
 
-Add the server and database to app.py
+Check the [./docker_debian/config.py](./docker_debian/config.py) contents and modify if needed.
 
 ### Step 2
 
 Run these to test or deploy:
 
 ```` bash
-cp app/*.* docker_debian/
+cp app/*.* docker_debian/app
+docker compose build
+docker compose up -d
+````
+This is the recommended way as the `docker-compose.yml` e.g. sets logging such that the log files will not grow without limit.
+
+To run without docker compose:
+```` bash
+cp app/*.* docker_debian/app
 cd docker_debian
 
 docker build -t gwtest .
@@ -72,6 +80,8 @@ docker build -t ble-gateway .
 sudo docker run -d --restart=always --net=host --privileged -i -t ble-gateway
 
 ````
+
+
 
 Other docker commands that might be of help in some environments:
 ```` bash
