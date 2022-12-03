@@ -11,6 +11,7 @@ Raspberry pi gateway for BLE sensors. Work in progress.
 
 ## TODO / next steps
 
+* check out ~/code/cloned/ruuvitag/sensor for a very minimalistic MQTT based solution (the other containers might not be needed)
 * use environment variables or a JSON config to pass all sensitive information. Would also make changing endpoints easy.
 
 
