@@ -148,7 +148,13 @@ Note that in all Influx variants the credentials/host live in `config.py`
 them from environment variables instead: `SENSOR_DATA_HOST`, `SENSOR_DATA_PORT`
 and `GATEWAY_NAME`.
 
-# Architecture of the HTTP variant
+# Data flow: how Ruuvi data reaches the lab's InfluxDB
+
+There are three ingestion paths in the home lab. Only the first is what this
+repo implements; the other two run against the official Ruuvi Gateway and are
+shown here for completeness.
+
+## Path 1 — this gateway (HTTP variant, the code in `balena_basic_http/`)
 
 ```mermaid
 flowchart LR
@@ -167,22 +173,14 @@ flowchart LR
         VIS["Grafana :3000 + heat-report"]
     end
 
-    subgraph other["Independent parallel feed"]
-        RGW["Official Ruuvi Gateway (.221)"]
-        LST["sensor_data_backend_mqtt_listener"]
-        MDB[("db mqtt")]
-    end
-
     T -- "BLE scan loop" --> GWC
     GWC -- "POST tig.server.home:5001/sendData<br/>{sensor, device: MAC, payload{...}}<br/>SNAT'd via router (source 192.168.20.1)" --> API
     API -- "measurement ruuvi_gw_kavallinmaki,<br/>tag device=MAC" --> DB
     DB --> CQ
     CQ -- "readings" --> VIS
-    RGW -- "MQTT → mqtt.server.home" --> LST
-    LST --> MDB
 ```
 
-## What the backend does on receipt
+### What the backend does on receipt
 
 The receiving API is the `http_api` service of the separate repo
 `mqtt_sensor_data_backend` (GitLab: `jussitapiokorpela/mqtt_sensor_data_backend`,
@@ -204,7 +202,64 @@ which database, retention policy or naming convention is used lives behind the
 HTTP endpoint, and swapping the storage backend does not require touching the
 gateway image.
 
+## Path 2 — the InfluxDB-direct alternative (what master did)
+
+The Influx variants (`docker_debian/`, `balena_basic/`, `balena_wificonnect/`)
+do **not** have a middleman: `app.py` builds InfluxDB `Point`s itself
+(`influxdb2_reporter.py` / `reporter.py` in `app/`) and writes them straight to
+the database configured in `config.py` (`INFLUX_HOST`, `INFLUX_PORT`,
+`INFLUX_DB`, and for v2 `INFLUX_TOKEN`/`INFLUX_BUCKET`). The measurement name
+is hard-coded `ruuvitag` and the record layout (temperature, humidity, pressure,
+acceleration, battery tags/fields) is fixed inside the reporter code.
+
+The trade-offs vs the HTTP variant: fewer moving parts and no dependency on a
+running backend service (the gateway keeps writing even if VM 103 is rebooted)
+— but the image carries DB credentials and an Influx client library, every DB
+layout change requires rebuilding the gateway image, and the storage backend is
+fixed at build time. The HTTP variant exists precisely to move that coupling
+behind a plain JSON API.
+
+## Path 3 — periodic reads of the official Ruuvi Gateway (two feeds)
+
+The official Ruuvi Gateway (192.168.20.221) feeds the lab **independently of
+this repo**, over transports started from the lab rather than the device:
+
+```mermaid
+flowchart LR
+    GW["Official Ruuvi Gateway<br/>(192.168.20.221)"]
+
+    subgraph tig2["Data collector VM 103 (mc-02)"]
+        LST["sensor_data_backend_mqtt_listener"]
+        MDB[("db mqtt")]
+        RHP["ruuvi-history-proxy<br/>FastAPI :8080<br/>(polls GET /history,<br/>SQLite cache,<br/>registered client IDs)"]
+        TG["telegraf<br/>inputs.http + json_v2<br/>measurement ruuvigw"]
+        DB3[("influxdb3-core container<br/>db local_system")]
+    end
+
+    GW -- " MQTT publish → mqtt.server.home<br/>(broker on LXC 100)" --> LST
+    LST --> MDB
+    GW -- "HTTP REST /history" --> RHP
+    RHP -- "GET http://ruuvi-history-proxy:8080/history?client_id=TIG-stack-telegraf-client" --> TG
+    TG --> DB3
+```
+
+* **MQTT feed:** the gateway publishes tagged MQTT to the `mqtt.server.home`
+  broker; `sensor_data_backend_mqtt_listener` subscribes and writes to InfluxDB
+  v1 database `mqtt` (GitLab: `mqtt_sensor_data_backend`).
+* **HTTP history feed:** `ruuvi-history-proxy` (GitLab: `ruuvi-history-proxy`,
+  a FastAPI service with SQLite caching and per-client `/history` delivery)
+  periodically reads the gateway's `/history` HTTP REST endpoint using a
+  gateway API token configured in its env (`ruuvi_gateway_ip`,
+  `ruuvi_gateway_token`).
+  Telegraf then polls the proxy's own `/history?client_id=TIG-stack-telegraf-client`
+  — a client ID registered automatically at startup — parses the JSON with its
+  `json_v2` parser into measurement `ruuvigw`, and writes it to the InfluxDB 3
+  (`influxdb3-core`) database `local_system`.
+
 ## Probable balena deployment flow (HTTP variant)
+
+Commands follow the current balena CLI guide (`balena push` remains the
+documented cloud-build-and-release path; flags as of CLI v24–25).
 
 1. `balena login` (opens a browser session against balenaCloud).
 2. Copy the source files into the fleet build directory:
@@ -212,22 +267,31 @@ gateway image.
    cp app/*.* balena_basic_http/app
    cd balena_basic_http
    ```
-3. Set the fleet environment variables in balenaCloud (dashboard → BLE-gateway-test
-   fleet → Environment variables):
+3. Set the fleet environment variables in balenaCloud (dashboard → fleet →
+   Environment variables; they are injected into the container at start):
    * `SENSOR_DATA_HOST=tig.server.home`
    * `SENSOR_DATA_PORT=5001`
    * `GATEWAY_NAME=ruuvi_gw_kavallinmaki`
 4. Build and release from the build directory:
    ```bash
-   balena push BLE-gateway-test --noparent-check
+   balena push <fleet-slug>        # e.g. jutako/ble-gateway-test — the org/fleet slug
    ```
-   `Dockerfile.template` is rendered per-device-type by the balena builders
-   (`%%BALENA_MACHINE_NAME%%` becomes e.g. `raspberry-pi`), the image is built
-   in balenaCloud, and a release is created.
-5. The device supervisor on the Raspberry Pi Zero downloads the release, starts
+   This sends the directory to balenaCloud's build servers. `balena_basic_http/`
+   holds only a `Dockerfile.template` (no `docker-compose.yml`), so balena builds
+   it as a single-container project. Note: a `docker-compose.yml` in the pushed
+   directory would take precedence over the `Dockerfile.template`.
+   The template supports `%%BALENA_*%%` tokens (`%%BALENA_MACHINE_NAME%%` for
+   the fleet's default device type; newer docs recommend `%%BALENA_ARCH%%` in
+   base image names instead).
+5. Optional useful flags: `--source <dir>` (push a subdirectory without cd-ing),
+   `--nocache`, `--draft` (build without making it a live release), `--note`
+   and `--release-tag` (annotate the release). The old `--noparent-check` flag
+   still exists but is only needed when a stray `docker-compose.yml` lurks in a
+   parent directory — for a self-contained build dir it can be dropped.
+6. The device supervisor on the Raspberry Pi Zero downloads the release, starts
    the privileged container with the fleet environment injected, and `app_http.py`
    binds the built-in Bluetooth and starts the scan loop (`RuuviTagSensor.get_data`).
-6. Every received tag decode within `MIN_REPORT_INTERVAL_SEC` is POSTed to the
+7. Every received tag decode within `MIN_REPORT_INTERVAL_SEC` is POSTed to the
    backend; nothing is stored on the gateway itself.
 
 Live behaviour observed in the homelab: the Zero (named "raspi zero ruuvi gw"
