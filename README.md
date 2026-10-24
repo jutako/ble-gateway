@@ -98,11 +98,17 @@ Install balena command line tool. Then:
 
 ```` bash
 balena login
+cp app/*.* balena_basic_http/app
+cd balena_basic_http
+balena push BLE-gateway-test --noparent-check
+````
+
+```` bash
+balena login
 mkdir balena_basic/
 cp app/*.* balena_basic/app
 cp app/config_prod.py balena_basic/app/config.py
 cd balena_basic
-balena push BLE-gateway # OR
 balena push BLE-gateway-test
 ````
 
