@@ -131,9 +131,8 @@ Files under `balena_wificonnect` are copies from `app` as files to copy need to 
 # Deployment variants (what lives in each subfolder)
 
 The shared source of truth is `app/`. Before building a container, the master
-versions are copied into the variant's `app/` directory (they are not tracked
-in git for the variants below — except in `balena_basic_http`, where they were
-committed as a snapshot):
+versions are copied into the variant's `app/` directory; those copies are
+gitignored build artefacts and not tracked in the repository.
 
 | Folder | Variant | Entrypoint | Data write path |
 |---|---|---|---|

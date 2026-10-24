@@ -109,3 +109,4 @@ docker_debian/config.py
 balena_wificonnect/app/
 balena_basic/app/
 tmp/
+balena_basic_http/app/
