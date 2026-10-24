@@ -304,7 +304,7 @@ debugging of this series (`sensors/ruuvi_gw_kavallinmaki`), see the
 
 # Changelog
 
-2026-10-24 Added architecture docs: HTTP-backend variant, subfolder variants, mermaid data flow to InfluxDB, and the balena deployment flow (branch feature/changes-from-2023)
-2022-09-11 Added three new ruuvi tag mac addresses
-2021-06-19 Upgraded balena wifi-connect. Now using debian from balena container images as the base. Balena python example was outdated.
-2021-01-23 Changed to python:3.8-buster in Dockerfile due to pip install problems. Improved pip installation commands as well.
+- **2026-10-24** — Added architecture docs: HTTP-backend variant, subfolder variants, mermaid data flow to InfluxDB, and the balena deployment flow (branch `feature/changes-from-2023`).
+- **2022-09-11** — Added three new Ruuvi tag MAC addresses.
+- **2021-06-19** — Upgraded balena wifi-connect. Now using debian from balena container images as the base. Balena python example was outdated.
+- **2021-01-23** — Changed to `python:3.8-buster` in Dockerfile due to pip install problems. Improved pip installation commands as well.
